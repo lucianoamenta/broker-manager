@@ -172,11 +172,57 @@ Para evitar confusiones y garantizar tipado estricto sin tablas genéricas sobre
 
 ## 👥 Identidad, Roles y Modelos Eloquent
 
+### 1. Desacople Estricto de Identidad y Relación 1-a-1 (`User`)
+El modelo `User` representa exclusivamente la credencial de autenticación y acceso a la plataforma. No almacena datos del perfil funcional directamente; cada usuario se asocia mediante una relación estricta `hasOne` con la entidad correspondiente:
+* `user->employee`: Personal interno de planta (`Employee`) clasificado por `EmployeeType`.
+* `user->party`: Cliente asegurado / tomador de póliza (`Party`).
+* `user->organizationRepresentative`: Director o apoderado de una organización (`OrganizationRepresentative`).
+* `user->zoneRepresentative`: Supervisor o gerente regional (`ZoneRepresentative`).
+* `user->departmentRepresentative`: Responsable de área funcional (`DepartmentRepresentative`).
+* `user->officeRepresentative`: Encargado de sucursal física (`OfficeRepresentative`).
+* `user->cashier`: Operador de caja registradora (`Cashier`).
+* `user->collector`: Recaudador territorial en calle (`Collector`).
+
+### 2. Matriz de Roles Estandarizada (`User::ROL_*` & Spatie Permissions)
+Los roles están unificados en constantes de `User.php` y se siembran a través de `RolesTableSeeder`:
+
+| Categoría | Constante (`User::*`) | Código del Rol (Slug) | Ámbito y Propósito |
+| :--- | :--- | :--- | :--- |
+| **Plataforma y Staff** | `ROL_GOD` | `god` | Superadministrador con bypass total de auditoría. |
+| | `ROL_ADMIN` | `admin` | Administrador general del broker. |
+| | `ROL_EMPLEADO` | `employee` | Operador interno de gestión y atención comercial. |
+| | `ROL_BOT` | `bot` | Procesos en segundo plano e integraciones API. |
+| | `ROL_MARKETING` | `marketing` | Gestión de campañas y comunicación comercial. |
+| | `ROL_TESORERO` | `treasurer` | Control financiero y arqueos de tesorería central. |
+| | `ROL_AUDITOR` | `auditor` | Cumplimiento normativo, auditoría y compliance. |
+| | `ROL_ABOGADO` | `lawyer` | Gestión legal, reclamos judiciales y contratos. |
+| **Jerarquía Territorial** | `ROL_ADMIN_ORGANIZATION` | `admin_organization` | Representante / apoderado de Organización. |
+| | `ROL_ADMIN_ZONE` | `admin_zone` | Supervisor o responsable de Zona comercial. |
+| | `ROL_ADMIN_DEPARTMENT` | `admin_department` | Jefe de Departamento funcional. |
+| | `ROL_ADMIN_OFFICE` | `admin_office` | Encargado o responsable de Oficina/Sucursal. |
+| | `ROL_TESORERO_DEPARTMENT`| `treasurer_department` | Responsable de finanzas a nivel departamento. |
+| | `ROL_ABOGADO_DEPARTMENT` | `lawyer_department` | Asesor legal específico de departamento. |
+| **Sucursal y Cobranza** | `ROL_CASHIER` | `cashier` | Operador asignado a caja física/bancaria. |
+| | `ROL_COLLECTOR` | `collector` | Recaudador de cobranza territorial en calle. |
+| **Clientes y Asegurados**| `ROL_CLIENTE` | `client` | Sujeto de derecho / tomador (Portal de cliente). |
+
+### 3. Tipos de Empleados Internos (`EmployeeType`)
+Para la nómina interna del broker (`employees`), los tipos se gestionan con constantes en `EmployeeType.php` y se siembran en `CatalogSeeder`:
+* `TYPE_GOD` (`god`): Super administrador con acceso total.
+* `TYPE_ADMIN` (`admin`): Administrador general del broker.
+* `TYPE_OPERATOR` (`operator`): Operador interno de atención al cliente (asociado al rol `employee`).
+* `TYPE_BOT` (`bot`): Usuario para procesos automatizados.
+* `TYPE_MARKETING` (`marketing`): Marketing, promociones y campañas.
+* `TYPE_TREASURER` (`treasurer`): Gestión y control de tesorería y finanzas.
+* `TYPE_AUDITOR` (`auditor`): Auditoría interna, compliance y control.
+* `TYPE_LAWYER` (`lawyer`): Asesoría legal, siniestros complejos y contratos.
+
+### 4. Estándares en Modelos Eloquent
 Todos los modelos implementan:
 - **`FindsByIdOrUuid` & `HasUuid`:** Búsqueda transparente por ID numérico o UUID en controladores y APIs.
-- **`HasCode`:** Resolución instantánea por código único en catálogos y tipos.
+- **`HasCode`:** Resolución instantánea por código único en catálogos y tipos (`findByCode()`).
 - **`casts()`:** Fechas tipadas a `date`/`datetime`, importes económicos a `decimal:2`, flags a `boolean` y metadatos a `array`.
-- **Relaciones Tipadas:** `BelongsTo`, `HasMany`, `HasOne`, `BelongsToMany` con métodos de retorno estrictos.
+- **Relaciones Tipadas:** `BelongsTo`, `HasMany`, `HasOne`, `BelongsToMany` con tipos de retorno estrictos de PHP 8.
 
 ---
 

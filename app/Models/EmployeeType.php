@@ -28,25 +28,21 @@ class EmployeeType extends Model
 
     const CODE_BOT = 'bot';
 
-    const TYPE_CASHIER = 'Cajero';
+    const TYPE_MARKETING = 'Marketing';
 
-    const CODE_CASHIER = 'cashier';
+    const CODE_MARKETING = 'marketing';
 
-    const TYPE_COLLECTOR = 'Recaudador';
+    const TYPE_TREASURER = 'Tesorero';
 
-    const CODE_COLLECTOR = 'collector';
+    const CODE_TREASURER = 'treasurer';
 
-    const TYPE_ZONE_SUPERVISOR = 'Supervisor de Zona';
+    const TYPE_AUDITOR = 'Auditor';
 
-    const CODE_ZONE_SUPERVISOR = 'zone_supervisor';
+    const CODE_AUDITOR = 'auditor';
 
-    const TYPE_DEPARTMENT_HEAD = 'Jefe de Departamento';
+    const TYPE_LAWYER = 'Abogado';
 
-    const CODE_DEPARTMENT_HEAD = 'department_head';
-
-    const TYPE_PRODUCER = 'Productor Asesor';
-
-    const CODE_PRODUCER = 'producer';
+    const CODE_LAWYER = 'lawyer';
 
     protected $fillable = [
         'name',

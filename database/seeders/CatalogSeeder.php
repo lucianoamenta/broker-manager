@@ -132,16 +132,14 @@ class CatalogSeeder extends Seeder
         $this->command->info('Seeding: Employee Types...');
 
         $typesEmployees = [
-            // !TODO: Actualizar bien todos los roles y sus codes para saber que tipo de usuarios pondremos en el sistema
             ['name' => EmployeeType::TYPE_GOD, 'code' => EmployeeType::CODE_GOD, 'description' => 'Super administrador con acceso total'],
-            ['name' => EmployeeType::TYPE_ADMIN, 'code' => EmployeeType::CODE_ADMIN, 'description' => 'Administrador del sistema'],
-            ['name' => EmployeeType::TYPE_OPERATOR, 'code' => EmployeeType::CODE_OPERATOR, 'description' => 'Operador de atención al cliente'],
-            ['name' => EmployeeType::TYPE_BOT, 'code' => EmployeeType::CODE_BOT, 'description' => 'Usuario para procesos automatizados'],
-            ['name' => EmployeeType::TYPE_CASHIER, 'code' => EmployeeType::CODE_CASHIER, 'description' => 'Operador de caja registradora y cobranza'],
-            ['name' => EmployeeType::TYPE_COLLECTOR, 'code' => EmployeeType::CODE_COLLECTOR, 'description' => 'Recaudador territorial de cobranza'],
-            ['name' => EmployeeType::TYPE_ZONE_SUPERVISOR, 'code' => EmployeeType::CODE_ZONE_SUPERVISOR, 'description' => 'Supervisor o gerente de zona'],
-            ['name' => EmployeeType::TYPE_DEPARTMENT_HEAD, 'code' => EmployeeType::CODE_DEPARTMENT_HEAD, 'description' => 'Responsable o jefe de departamento'],
-            ['name' => EmployeeType::TYPE_PRODUCER, 'code' => EmployeeType::CODE_PRODUCER, 'description' => 'Productor asesor de seguros (PAS)'],
+            ['name' => EmployeeType::TYPE_ADMIN, 'code' => EmployeeType::CODE_ADMIN, 'description' => 'Administrador general del broker'],
+            ['name' => EmployeeType::TYPE_OPERATOR, 'code' => EmployeeType::CODE_OPERATOR, 'description' => 'Operador interno de gestión y atención al cliente'],
+            ['name' => EmployeeType::TYPE_BOT, 'code' => EmployeeType::CODE_BOT, 'description' => 'Usuario para procesos automatizados e integraciones'],
+            ['name' => EmployeeType::TYPE_MARKETING, 'code' => EmployeeType::CODE_MARKETING, 'description' => 'Especialista en marketing, promociones y campañas'],
+            ['name' => EmployeeType::TYPE_TREASURER, 'code' => EmployeeType::CODE_TREASURER, 'description' => 'Gestión y control de tesorería y finanzas'],
+            ['name' => EmployeeType::TYPE_AUDITOR, 'code' => EmployeeType::CODE_AUDITOR, 'description' => 'Auditoría interna, compliance y control'],
+            ['name' => EmployeeType::TYPE_LAWYER, 'code' => EmployeeType::CODE_LAWYER, 'description' => 'Asesoría legal, siniestros complejos y contratos'],
         ];
 
         foreach ($typesEmployees as $type) {

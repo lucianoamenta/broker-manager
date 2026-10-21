@@ -20,23 +20,62 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    // --- Roles Principales / Internos (Personal y Staff de Plataforma) ---
     const ROL_GOD = 'god';
 
     const ROL_ADMIN = 'admin';
 
-    const ROL_CLIENTE = 'client';
-
     const ROL_EMPLEADO = 'employee';
+
+    const ROL_EMPLOYEE = self::ROL_EMPLEADO;
 
     const ROL_BOT = 'bot';
 
-    const ROL_ZONE_MANAGER = 'zone_manager';
+    const ROL_MARKETING = 'marketing';
 
-    const ROL_DEPARTMENT_HEAD = 'department_head';
+    const ROL_TESORERO = 'treasurer';
 
+    const ROL_TREASURER = self::ROL_TESORERO;
+
+    const ROL_AUDITOR = 'auditor';
+
+    const ROL_ABOGADO = 'lawyer';
+
+    const ROL_LAWYER = self::ROL_ABOGADO;
+
+    // --- Roles Organizacionales y Territoriales (Representantes / Encargados) ---
+    const ROL_ADMIN_ORGANIZATION = 'admin_organization';
+
+    const ROL_ADMIN_ZONE = 'admin_zone';
+
+    const ROL_ADMIN_DEPARTMENT = 'admin_department';
+
+    const ROL_ADMIN_OFFICE = 'admin_office';
+
+    const ROL_TESORERO_DEPARTMENT = 'treasurer_department';
+
+    const ROL_TREASURER_DEPARTMENT = self::ROL_TESORERO_DEPARTMENT;
+
+    const ROL_ABOGADO_DEPARTMENT = 'lawyer_department';
+
+    const ROL_LAWYER_DEPARTMENT = self::ROL_ABOGADO_DEPARTMENT;
+
+    // --- Roles Operativos de Sucursal, Caja y Cobranza ---
     const ROL_CASHIER = 'cashier';
 
     const ROL_COLLECTOR = 'collector';
+
+    // --- Rol de Clientes Finales / Asegurados (Parties) ---
+    const ROL_CLIENTE = 'client';
+
+    const ROL_CLIENT = self::ROL_CLIENTE;
+
+    // --- Aliases de compatibilidad con versiones previas ---
+    /** @deprecated Usar ROL_ADMIN_ZONE */
+    const ROL_ZONE_MANAGER = self::ROL_ADMIN_ZONE;
+
+    /** @deprecated Usar ROL_ADMIN_DEPARTMENT */
+    const ROL_DEPARTMENT_HEAD = self::ROL_ADMIN_DEPARTMENT;
 
     protected $dates = ['deleted_at'];
 
@@ -145,5 +184,41 @@ class User extends Authenticatable
     public function collector(): HasOne
     {
         return $this->hasOne(Collector::class);
+    }
+
+    /**
+     * Perfil de cliente / asegurado (Party) vinculado a este usuario.
+     */
+    public function party(): HasOne
+    {
+        return $this->hasOne(Party::class);
+    }
+
+    /**
+     * Lista completa y normalizada de todos los roles disponibles en el sistema.
+     *
+     * @return array<int, string>
+     */
+    public static function getAvailableRoles(): array
+    {
+        return [
+            self::ROL_GOD,
+            self::ROL_ADMIN,
+            self::ROL_EMPLEADO,
+            self::ROL_BOT,
+            self::ROL_MARKETING,
+            self::ROL_TESORERO,
+            self::ROL_AUDITOR,
+            self::ROL_ABOGADO,
+            self::ROL_ADMIN_ORGANIZATION,
+            self::ROL_ADMIN_ZONE,
+            self::ROL_ADMIN_DEPARTMENT,
+            self::ROL_ADMIN_OFFICE,
+            self::ROL_TESORERO_DEPARTMENT,
+            self::ROL_ABOGADO_DEPARTMENT,
+            self::ROL_CASHIER,
+            self::ROL_COLLECTOR,
+            self::ROL_CLIENTE,
+        ];
     }
 }

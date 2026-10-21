@@ -64,6 +64,7 @@ class Party extends Model
             : ($this->legal_name ?? '');
     }
 
+    //Usuario de acceso al sistema (portal del cliente) vinculado a este registro.
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
