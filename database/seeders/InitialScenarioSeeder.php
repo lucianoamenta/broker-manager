@@ -8,18 +8,24 @@ use App\Models\CashRegisterType;
 use App\Models\City;
 use App\Models\Collector;
 use App\Models\CollectorZone;
+use App\Models\Department;
+use App\Models\DepartmentRepresentative;
 use App\Models\Employee;
 use App\Models\EmployeeType;
 use App\Models\Gender;
 use App\Models\Insurer;
 use App\Models\MaritalStatus;
 use App\Models\Office;
+use App\Models\OfficeRepresentative;
 use App\Models\Organization;
 use App\Models\OrganizationInsurer;
 use App\Models\OrganizationPasAssignment;
+use App\Models\OrganizationRepresentative;
+use App\Models\Party;
 use App\Models\PasRegistration;
 use App\Models\User;
 use App\Models\Zone;
+use App\Models\ZoneRepresentative;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -281,6 +287,8 @@ class InitialScenarioSeeder extends Seeder
         $cashTypeVirtual = CashRegisterType::findByCode(CashRegisterType::CODE_VIRTUAL);
 
         $createdOrganizations = [];
+        $createdZones = [];
+        $createdOffices = [];
 
         foreach ($organizationsData as $data) {
             // 2.1 Organización
@@ -300,6 +308,7 @@ class InitialScenarioSeeder extends Seeder
                 ['code' => $data['zone']['code']],
                 $zoneData
             );
+            $createdZones[] = $zone;
 
             // 2.3 Oficina en la Zona
             $officeData = array_merge($data['office'], [
@@ -310,6 +319,7 @@ class InitialScenarioSeeder extends Seeder
                 ['code' => $data['office']['code']],
                 $officeData
             );
+            $createdOffices[] = $office;
 
             // 2.4 Cajas Registradoras (Física y Virtual)
             CashRegister::firstOrCreate(
@@ -524,6 +534,166 @@ class InitialScenarioSeeder extends Seeder
                 );
             }
         }
+
+        // =========================================================================
+        // 5. Representantes Organizacionales, Zonales, de Oficina y Departamento
+        // =========================================================================
+        $this->command->info('Creando representantes para terminales operativas...');
+
+        $passwordStaff = 'Operador$2020';
+
+        // 5.1 Representante de Organización
+        $orgRepUser = User::firstOrCreate(
+            ['username' => 'rep.organizacion'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'email' => "rep.organizacion@{$emailDomain}",
+                'password' => Hash::make($passwordStaff),
+                'is_verified' => true,
+                'is_allowed' => true,
+            ]
+        );
+        $orgRepUser->syncRoles([User::ROL_ADMIN_ORGANIZATION]);
+
+        OrganizationRepresentative::firstOrCreate(
+            ['user_id' => $orgRepUser->id],
+            [
+                'uuid' => (string) Str::uuid(),
+                'organization_id' => $createdOrganizations[0]->id,
+                'full_name' => 'Martín Palermo',
+                'cuit' => '20-22334455-8',
+                'personal_email' => "rep.organizacion@{$emailDomain}",
+                'personal_phone' => '+54 341 555-4433',
+                'is_active' => true,
+            ]
+        );
+
+        // 5.2 Representante de Zona
+        $zoneRepUser = User::firstOrCreate(
+            ['username' => 'rep.zona'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'email' => "rep.zona@{$emailDomain}",
+                'password' => Hash::make($passwordStaff),
+                'is_verified' => true,
+                'is_allowed' => true,
+            ]
+        );
+        $zoneRepUser->syncRoles([User::ROL_ADMIN_ZONE]);
+
+        ZoneRepresentative::firstOrCreate(
+            ['user_id' => $zoneRepUser->id],
+            [
+                'uuid' => (string) Str::uuid(),
+                'zone_id' => $createdZones[0]->id,
+                'full_name' => 'Carlos Bianchi',
+                'cuit' => '20-11223344-9',
+                'personal_email' => "rep.zona@{$emailDomain}",
+                'personal_phone' => '+54 341 555-4422',
+                'is_active' => true,
+            ]
+        );
+
+        // 5.3 Representante de Oficina
+        $officeRepUser = User::firstOrCreate(
+            ['username' => 'rep.oficina'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'email' => "rep.oficina@{$emailDomain}",
+                'password' => Hash::make($passwordStaff),
+                'is_verified' => true,
+                'is_allowed' => true,
+            ]
+        );
+        $officeRepUser->syncRoles([User::ROL_ADMIN_OFFICE]);
+
+        OfficeRepresentative::firstOrCreate(
+            ['user_id' => $officeRepUser->id],
+            [
+                'uuid' => (string) Str::uuid(),
+                'office_id' => $createdOffices[0]->id,
+                'full_name' => 'Guillermo Barros Schelotto',
+                'cuit' => '20-23456789-1',
+                'personal_email' => "rep.oficina@{$emailDomain}",
+                'personal_phone' => '+54 341 555-4411',
+                'is_active' => true,
+            ]
+        );
+
+        // 5.4 Departamento Funcional y Representante Departamental
+        $department = Department::firstOrCreate(
+            ['code' => 'DEP-TES-ADM'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'organization_id' => $createdOrganizations[0]->id,
+                'name' => 'Tesorería y Administración Central',
+                'description' => 'Área de tesorería, finanzas, rendiciones y cobranzas consolidadas',
+                'is_active' => true,
+            ]
+        );
+
+        $deptRepUser = User::firstOrCreate(
+            ['username' => 'rep.departamento'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'email' => "rep.departamento@{$emailDomain}",
+                'password' => Hash::make($passwordStaff),
+                'is_verified' => true,
+                'is_allowed' => true,
+            ]
+        );
+        $deptRepUser->syncRoles([User::ROL_ADMIN_DEPARTMENT]);
+
+        DepartmentRepresentative::firstOrCreate(
+            ['user_id' => $deptRepUser->id],
+            [
+                'uuid' => (string) Str::uuid(),
+                'department_id' => $department->id,
+                'full_name' => 'Román Riquelme',
+                'cuit' => '20-24567890-2',
+                'personal_email' => "rep.departamento@{$emailDomain}",
+                'personal_phone' => '+54 341 555-4400',
+                'position' => DepartmentRepresentative::POSITION_TREASURER,
+                'is_active' => true,
+            ]
+        );
+
+        // =========================================================================
+        // 6. Cliente Final / Asegurado (Party) para Portal de Clientes (/login)
+        // =========================================================================
+        $this->command->info('Creando cliente final / asegurado de prueba para /login...');
+
+        $clientUser = User::firstOrCreate(
+            ['email' => "cliente@{$emailDomain}"],
+            [
+                'uuid' => (string) Str::uuid(),
+                'username' => 'cliente.portal',
+                'password' => Hash::make('Cliente$2020'),
+                'is_verified' => true,
+                'is_allowed' => true,
+            ]
+        );
+        $clientUser->syncRoles([User::ROL_CLIENT]);
+
+        Party::firstOrCreate(
+            ['tax_id' => '34567890'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'user_id' => $clientUser->id,
+                'is_individual' => true,
+                'first_name' => 'Juan Carlos',
+                'last_name' => 'Pérez',
+                'tax_id_type' => Party::TAX_TYPE_DNI,
+                'gender_id' => $genderMale->id,
+                'marital_status_id' => $maritalMarried->id,
+                'birth_date' => '1989-05-14',
+                'personal_email' => "cliente@{$emailDomain}",
+                'personal_phone' => '+54 341 555-7788',
+                'address' => 'Bv. Oroño 2400',
+                'city_id' => $cityRosario->id,
+                'is_active' => true,
+            ]
+        );
 
         $this->command->info('Escenario inicial construido exitosamente.');
 

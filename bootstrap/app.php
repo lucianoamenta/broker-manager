@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Middlewares\UpdateDeviceIp;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middlewares\UpdateDeviceIp;
 use Illuminate\Http\Request;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,19 +24,55 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'update.device.ip' => UpdateDeviceIp::class,
-            // 'role.admin' => DashboardAdminMiddleware::class,
-            // 'role.god_admin' => \App\Http\Middleware\DashboardGodAdminMiddleware::class,
-            // 'role.client' => \App\Http\Middleware\DashboardClientMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
         $middleware->redirectTo(
-            guests: function (\Illuminate\Http\Request $request) {
-                if (!$request->expectsJson()) {
-                    session()->flash('error', 'No te encuentras autenticado en el sistema. Debes iniciar sesión para acceder.');
-                    return route('dashboard.client.login');
+            guests: function (Request $request) {
+                if (! $request->expectsJson()) {
+                    session()->flash('error', 'Debes iniciar sesión para acceder al sistema.');
+                    if ($request->is('admin*') || $request->is('auth/security/console/admin*')) {
+                        return route('auth.admin.login');
+                    }
+                    if ($request->is('console*') || $request->is('auth/console*')) {
+                        return route('auth.console.login');
+                    }
+
+                    return route('login');
                 }
+
                 return null;
             },
-            users: '/dashboard/overview'
+            users: function (Request $request) {
+                $user = $request->user();
+                if (! $user) {
+                    return route('home');
+                }
+                if ($user->hasAnyRole([User::ROL_GOD, User::ROL_ADMIN])) {
+                    return route('admin.dashboard');
+                }
+                if ($user->hasRole(User::ROL_CLIENTE)) {
+                    return route('portal.dashboard');
+                }
+                if ($user->hasRole(User::ROL_CASHIER)) {
+                    return route('console.cashier.dashboard');
+                }
+                if ($user->hasRole(User::ROL_COLLECTOR)) {
+                    return route('console.collector.dashboard');
+                }
+                if ($user->hasRole(User::ROL_ADMIN_OFFICE)) {
+                    return route('console.office.dashboard');
+                }
+                if ($user->hasRole(User::ROL_ADMIN_ZONE)) {
+                    return route('console.zone.dashboard');
+                }
+                if ($user->hasRole(User::ROL_ADMIN_ORGANIZATION)) {
+                    return route('console.organization.dashboard');
+                }
+
+                return route('console.department.dashboard');
+            }
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {

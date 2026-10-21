@@ -233,22 +233,62 @@ El seeder `InitialScenarioSeeder` construye automáticamente el entorno base del
 
 ### Cuentas Sembradas para Pruebas y Acceso:
 
-| Rol / Función | Username | Email | Contraseña | Entidad Asociada |
-| :--- | :--- | :--- | :--- | :--- |
-| **Administrador** | `luciano.amenta` | `luciano.amenta@broker-manager.com` | `Abanico$2020` | Empleado Luciano Amenta |
-| **Superadmin God**| `oficina.abanico` | `oficina.abanico@broker-manager.com` | `Abanico$2020` | Empleado Oficina Abanico |
-| **Cajero Litoral** | `cajero.rosario` | `cajero.rosario@broker-manager.com` | `Cajero$2020` | Casa Central Rosario |
-| **Cajero Cuyo** | `cajero.mendoza` | `cajero.mendoza@broker-manager.com` | `Cajero$2020` | Sucursal Mendoza Peatonal |
-| **Cajero Patagonia**| `cajero.neuquen`| `cajero.neuquen@broker-manager.com` | `Cajero$2020` | Sucursal Neuquén Centro |
-| **Recaudador Litoral**| `recaudador.litoral` | `recaudador.litoral@broker-manager.com` | `Recaudador$2020` | Zona Litoral y Santa Fe |
-| **Recaudador Cuyo**| `recaudador.cuyo` | `recaudador.cuyo@broker-manager.com` | `Recaudador$2020` | Zona Cuyo y Gran Mendoza |
-| **Recaudador Patagonia**| `recaudador.patagonia` | `recaudador.patagonia@broker-manager.com` | `Recaudador$2020` | Zona Alto Valle Patagonia |
+| Rol / Función | Username | Email | Contraseña | Portal de Acceso | Entidad Asociada |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cliente / Asegurado** | `cliente.portal` | `cliente@broker-manager.com` | `Cliente$2020` | `/login` (Email) | Titular Juan Carlos Pérez (DNI 34567890) |
+| **Administrador** | `luciano.amenta` | `luciano.amenta@broker-manager.com` | `Abanico$2020` | `/auth/security/console/admin` | Empleado Luciano Amenta |
+| **Superadmin God**| `oficina.abanico` | `oficina.abanico@broker-manager.com` | `Abanico$2020` | `/auth/security/console/admin` | Empleado Oficina Abanico |
+| **Cajero Litoral** | `cajero.rosario` | `cajero.rosario@broker-manager.com` | `Cajero$2020` | `/auth/console/login` (Username) | Casa Central Rosario |
+| **Cajero Cuyo** | `cajero.mendoza` | `cajero.mendoza@broker-manager.com` | `Cajero$2020` | `/auth/console/login` (Username) | Sucursal Mendoza Peatonal |
+| **Cajero Patagonia**| `cajero.neuquen`| `cajero.neuquen@broker-manager.com` | `Cajero$2020` | `/auth/console/login` (Username) | Sucursal Neuquén Centro |
+| **Recaudador Litoral**| `recaudador.rosario` | `recaudador.rosario@broker-manager.com` | `Recaudador$2020` | `/auth/console/login` (Username) | Zona Litoral y Santa Fe |
+| **Recaudador Cuyo**| `recaudador.cuyo` | `recaudador.cuyo@broker-manager.com` | `Recaudador$2020` | `/auth/console/login` (Username) | Zona Cuyo y Gran Mendoza |
+| **Recaudador Patagonia**| `recaudador.patagonia` | `recaudador.patagonia@broker-manager.com` | `Recaudador$2020` | `/auth/console/login` (Username) | Zona Alto Valle Patagonia |
+| **Rep. Organización** | `rep.organizacion` | `rep.organizacion@broker-manager.com` | `Operador$2020` | `/auth/console/login` (Username) | Directorio Broker Central Litoral |
+| **Rep. Zona** | `rep.zona` | `rep.zona@broker-manager.com` | `Operador$2020` | `/auth/console/login` (Username) | Jurisdicción Zona Litoral |
+| **Rep. Oficina** | `rep.oficina` | `rep.oficina@broker-manager.com` | `Operador$2020` | `/auth/console/login` (Username) | Sucursal Central Rosario |
+| **Rep. Departamento** | `rep.departamento` | `rep.departamento@broker-manager.com` | `Operador$2020` | `/auth/console/login` (Username) | Tesorería y Administración Central |
 
 ### Entidades Sembradas:
 * **3 Organizaciones:** Broker Central Litoral (`ORG-LITORAL`), Organización Cuyo Seguros (`ORG-CUYO`), Broker Patagonia Norte (`ORG-PATAGONIA`).
 * **3 Zonas y 3 Oficinas:** Cada organización posee su zona principal, una sucursal operativa radicada y dos cajas registradoras (1 Física, 1 Digital/Virtual).
 * **1 Matrícula PAS:** Matrícula SSN `85420` asignada a las 3 organizaciones.
 * **4 Aseguradoras:** Finisterre Seguros, Antártida Seguros, Providencia Seguros y Rivadavia Seguros asociadas con las organizaciones.
+* **1 Cliente Testigo (Party):** Juan Carlos Pérez con perfil completo, DNI y cuenta de usuario vinculada.
+
+---
+
+## 🔐 Portales de Autenticación Segregados y Control de Dispositivo Único
+
+El sistema cuenta con **3 puntos de entrada web completamente aislados y especializados**, con middlewares de rol, redirección contextual y control estricto de **dispositivo único activo simultáneo** mediante `DeviceSessionService` y el modelo `Device`:
+
+1. **Portal de Clientes y Asegurados (`/login`):**
+   - **Audiencia:** Exclusiva para usuarios con rol `client`.
+   - **Credenciales:** `email` + `password`.
+   - **Destino:** Dashboard del asegurado (`/portal/dashboard`).
+   - **UI/UX:** Sidenav personal, carrusel de pólizas vigentes, estado de cuotas, botón de ver perfil con modal de detalles y confirmación de logout segura hacia `/login`.
+
+2. **Consola Ejecutiva de Seguridad (`/auth/security/console/admin`):**
+   - **Audiencia:** Exclusiva para `admin` y `god`. Oculta de landing o menús públicos.
+   - **Credenciales:** `login` (`email` o `username`) + `password`.
+   - **Destino:** Consola directiva de seguridad (`/admin/dashboard`).
+   - **UI/UX:** Tema dark glassmorphism de alta tecnología, métricas de broker, matriz organizacional, logs de auditoría en vivo, ver perfil y confirmación de logout segura hacia `/auth/security/console/admin`.
+
+3. **Terminal Operativa y de Sucursales (`/auth/console/login`):**
+   - **Audiencia:** Exclusiva para personal operativo (`cashier`, `collector`, `admin_office`, `admin_zone`, `admin_organization`, `admin_department`). Oculta de menús públicos.
+   - **Credenciales:** `username` + `password`.
+   - **Destino Inteligente:** Redirección automática según el rol operativo del usuario:
+     - Cajero $\rightarrow$ `/console/cajero/dashboard` (Arqueos, caja física/virtual, cobros).
+     - Recaudador $\rightarrow$ `/console/recaudador/dashboard` (Hojas de ruta, lotes de cobranza, rendiciones).
+     - Rep. Oficina $\rightarrow$ `/console/oficina/dashboard` (Supervisión de sucursal, personal, cajas).
+     - Rep. Zona $\rightarrow$ `/console/zona/dashboard` (Control zonal, sucursales, recaudadores asignados).
+     - Rep. Organización $\rightarrow$ `/console/organizacion/dashboard` (Directorio de broker, aseguradoras, matrículas PAS).
+     - Rep. Departamento $\rightarrow$ `/console/departamento/dashboard` (Gestión departamental y expedientes).
+   - **UI/UX:** Sidenav adaptativo con ítems condicionados al rol, panel de control, modal de perfil con datos de terminal y confirmación de logout segura hacia `/auth/console/login`.
+
+4. **Regla de Sesión Única por Dispositivo (`Device`):**
+   - Al autenticarse satisfactoriamente por cualquiera de las 3 vías, el servicio `DeviceSessionService::logoutAllWebDevices($user)` revoca cualquier sesión web previa del usuario y genera un nuevo registro activo en la tabla `devices` (`web_session_{sessionId}`).
+   - Al confirmar el logout desde el perfil, se revoca el dispositivo activo y se invalida la sesión PHP.
 
 ---
 
