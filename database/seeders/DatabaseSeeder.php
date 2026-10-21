@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\EmployeeType;
 use App\Models\FiscalCondition;
 use App\Models\Gender;
+use App\Models\InsuredRiskType;
 use App\Models\MaritalStatus;
 use App\Models\Notification;
 use App\Models\OccupationalStatus;
@@ -26,7 +27,6 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         BusinessActivity::truncate();
         City::truncate();
@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         EmployeeType::truncate();
         FiscalCondition::truncate();
         Gender::truncate();
+        InsuredRiskType::truncate();
         MaritalStatus::truncate();
         Notification::truncate();
         OccupationalStatus::truncate();
@@ -50,6 +51,7 @@ class DatabaseSeeder extends Seeder
         EmployeeType::flushEventListeners();
         FiscalCondition::flushEventListeners();
         Gender::flushEventListeners();
+        InsuredRiskType::flushEventListeners();
         MaritalStatus::flushEventListeners();
         Notification::flushEventListeners();
         OccupationalStatus::flushEventListeners();
@@ -62,7 +64,7 @@ class DatabaseSeeder extends Seeder
             CitiesTableSeeder::class,
             RolesTableSeeder::class,
             CatalogSeeder::class,
+            InitialScenarioSeeder::class,
         ]);
-
     }
 }

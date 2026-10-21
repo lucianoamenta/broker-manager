@@ -111,14 +111,15 @@ Organización (Broker / Matriz)
 ### Bloque 3: Clientes Globales (Parties) y Riesgos Asegurables
 
 * **`parties`:** Sujeto de derecho global (persona física o empresa). No pertenece a una sola organización, facilitando la omnicanalidad (portal web central, sucursales físicas multizona).
-* **`insured_risks`:** Cabecera común de bienes o personas asegurables, perteneciente a un `party_id`.
+* **`insured_risk_types`:** Catálogo estandarizado de tipología de riesgos amparados (`vehicle`, `property`, `surety_bond`, `commercial`, `person`).
+* **`insured_risks`:** Cabecera común de bienes o personas asegurables, perteneciente a un `party_id` y tipificada mediante `insured_risk_type_id`.
 * **Especializaciones de Riesgo:**
   * `vehicles`: Dominio/patente, marca, modelo, versión, año, motor, chasis/VIN, uso y GNC.
   * `properties`: Inmuebles residenciales, comerciales o industriales, superficie y seguridad.
   * `surety_bonds`: **Seguros de Caución y Garantías** (alquileres, contratos de obra pública/privada, fondos de reparo y aduanas) con beneficiario (`beneficiary_party_id`).
   * `commercial_risks`: Comercios e industrias con rubro de actividad y stock declarado.
   * `insured_people`: Personas aseguradas en pólizas de vida y accidentes personales (AP).
-* **Modelos:** `Party`, `InsuredRisk`, `Vehicle`, `Property`, `SuretyBond`, `CommercialRisk`, `InsuredPerson`.
+* **Modelos:** `Party`, `InsuredRiskType`, `InsuredRisk`, `Vehicle`, `Property`, `SuretyBond`, `CommercialRisk`, `InsuredPerson`.
 
 ---
 
@@ -223,6 +224,31 @@ Todos los modelos implementan:
 - **`HasCode`:** Resolución instantánea por código único en catálogos y tipos (`findByCode()`).
 - **`casts()`:** Fechas tipadas a `date`/`datetime`, importes económicos a `decimal:2`, flags a `boolean` y metadatos a `array`.
 - **Relaciones Tipadas:** `BelongsTo`, `HasMany`, `HasOne`, `BelongsToMany` con tipos de retorno estrictos de PHP 8.
+
+---
+
+## 🎭 Escenario Inicial de Operaciones (`InitialScenarioSeeder`)
+
+El seeder `InitialScenarioSeeder` construye automáticamente el entorno base del broker adaptando dinámicamente el dominio de correo según el `APP_NAME` del `.env` (`@broker-manager.com`):
+
+### Cuentas Sembradas para Pruebas y Acceso:
+
+| Rol / Función | Username | Email | Contraseña | Entidad Asociada |
+| :--- | :--- | :--- | :--- | :--- |
+| **Administrador** | `luciano.amenta` | `luciano.amenta@broker-manager.com` | `Abanico$2020` | Empleado Luciano Amenta |
+| **Superadmin God**| `oficina.abanico` | `oficina.abanico@broker-manager.com` | `Abanico$2020` | Empleado Oficina Abanico |
+| **Cajero Litoral** | `cajero.rosario` | `cajero.rosario@broker-manager.com` | `Cajero$2020` | Casa Central Rosario |
+| **Cajero Cuyo** | `cajero.mendoza` | `cajero.mendoza@broker-manager.com` | `Cajero$2020` | Sucursal Mendoza Peatonal |
+| **Cajero Patagonia**| `cajero.neuquen`| `cajero.neuquen@broker-manager.com` | `Cajero$2020` | Sucursal Neuquén Centro |
+| **Recaudador Litoral**| `recaudador.litoral` | `recaudador.litoral@broker-manager.com` | `Recaudador$2020` | Zona Litoral y Santa Fe |
+| **Recaudador Cuyo**| `recaudador.cuyo` | `recaudador.cuyo@broker-manager.com` | `Recaudador$2020` | Zona Cuyo y Gran Mendoza |
+| **Recaudador Patagonia**| `recaudador.patagonia` | `recaudador.patagonia@broker-manager.com` | `Recaudador$2020` | Zona Alto Valle Patagonia |
+
+### Entidades Sembradas:
+* **3 Organizaciones:** Broker Central Litoral (`ORG-LITORAL`), Organización Cuyo Seguros (`ORG-CUYO`), Broker Patagonia Norte (`ORG-PATAGONIA`).
+* **3 Zonas y 3 Oficinas:** Cada organización posee su zona principal, una sucursal operativa radicada y dos cajas registradoras (1 Física, 1 Digital/Virtual).
+* **1 Matrícula PAS:** Matrícula SSN `85420` asignada a las 3 organizaciones.
+* **4 Aseguradoras:** Finisterre Seguros, Antártida Seguros, Providencia Seguros y Rivadavia Seguros asociadas con las organizaciones.
 
 ---
 

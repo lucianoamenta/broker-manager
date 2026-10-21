@@ -27,7 +27,7 @@ class InsuredRisk extends Model
     protected $fillable = [
         'uuid',
         'party_id',
-        'risk_type',
+        'insured_risk_type_id',
         'identifier',
         'description',
         'is_active',
@@ -41,6 +41,14 @@ class InsuredRisk extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Tipo de bien o riesgo asegurable tipado.
+     */
+    public function insuredRiskType(): BelongsTo
+    {
+        return $this->belongsTo(InsuredRiskType::class);
     }
 
     public function party(): BelongsTo

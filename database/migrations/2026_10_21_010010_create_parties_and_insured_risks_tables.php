@@ -36,12 +36,20 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // 2. Cabecera común de Riesgos Asegurables (Vehículos, Inmuebles, Cauciones, Comercios, Personas)
+        // 2. Catálogo de Tipos de Riesgo Asegurable (Vehículos, Inmuebles, Cauciones, Comercios, Personas)
+        Schema::create('insured_risk_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 100);
+            $table->string('code', 50)->unique();
+            $table->string('description', 255)->nullable();
+        });
+
+        // 3. Cabecera común de Riesgos Asegurables
         Schema::create('insured_risks', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignId('party_id')->nullable()->constrained('parties')->nullOnDelete(); // Titular o dueño del bien
-            $table->string('risk_type', 30)->index(); // vehicle, property, surety_bond, commercial, person
+            $table->foreignId('insured_risk_type_id')->constrained('insured_risk_types');
             $table->string('identifier', 100)->index(); // Patente, CUIT, DNI, dirección o número de contrato para búsqueda ágil
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true)->index();
@@ -141,6 +149,7 @@ return new class extends Migration
         Schema::dropIfExists('properties');
         Schema::dropIfExists('vehicles');
         Schema::dropIfExists('insured_risks');
+        Schema::dropIfExists('insured_risk_types');
         Schema::dropIfExists('parties');
     }
 };

@@ -10,6 +10,7 @@ use App\Models\DepartmentFileType;
 use App\Models\EmployeeType;
 use App\Models\FiscalCondition;
 use App\Models\Gender;
+use App\Models\InsuredRiskType;
 use App\Models\InsurerFileType;
 use App\Models\MaritalStatus;
 use App\Models\OfficeFileType;
@@ -43,7 +44,7 @@ class CatalogSeeder extends Seeder
         ];
 
         foreach ($maritalStatuses as $maritalStatus) {
-            MaritalStatus::create($maritalStatus);
+            MaritalStatus::firstOrCreate(['code' => $maritalStatus['code']], $maritalStatus);
         }
 
         // =========================================================================
@@ -62,7 +63,7 @@ class CatalogSeeder extends Seeder
         ];
 
         foreach ($genders as $gender) {
-            Gender::create($gender);
+            Gender::firstOrCreate(['code' => $gender['code']], $gender);
         }
 
         // =========================================================================
@@ -99,7 +100,7 @@ class CatalogSeeder extends Seeder
         ];
 
         foreach ($activities as $activity) {
-            BusinessActivity::create($activity);
+            BusinessActivity::firstOrCreate(['code' => $activity['code']], $activity);
         }
 
         // =========================================================================
@@ -121,7 +122,7 @@ class CatalogSeeder extends Seeder
         ];
 
         foreach ($fiscalConditionData as $fiscalCondition) {
-            FiscalCondition::create($fiscalCondition);
+            FiscalCondition::firstOrCreate(['code' => $fiscalCondition['code']], $fiscalCondition);
         }
 
         // =========================================================================
@@ -144,6 +145,44 @@ class CatalogSeeder extends Seeder
 
         foreach ($typesEmployees as $type) {
             EmployeeType::firstOrCreate(['code' => $type['code']], $type);
+        }
+
+        // =========================================================================
+        // 5.1 Insured Risk Types (Tipos de Riesgo / Bien Asegurable)
+        // Propósito: Clasificación normalizada de bienes y sujetos asegurables.
+        // =========================================================================
+        $this->command->info('Seeding: Insured Risk Types...');
+
+        $insuredRiskTypes = [
+            [
+                'name' => InsuredRiskType::TYPE_VEHICLE,
+                'code' => InsuredRiskType::CODE_VEHICLE,
+                'description' => 'Automotores, motovehículos, utilitarios y camiones',
+            ],
+            [
+                'name' => InsuredRiskType::TYPE_PROPERTY,
+                'code' => InsuredRiskType::CODE_PROPERTY,
+                'description' => 'Inmuebles residenciales, countries, departamentos y locales',
+            ],
+            [
+                'name' => InsuredRiskType::TYPE_SURETY_BOND,
+                'code' => InsuredRiskType::CODE_SURETY_BOND,
+                'description' => 'Cauciones de alquiler, obras públicas/privadas y garantías',
+            ],
+            [
+                'name' => InsuredRiskType::TYPE_COMMERCIAL,
+                'code' => InsuredRiskType::CODE_COMMERCIAL,
+                'description' => 'Comercios, industrias, depósitos y coberturas integrales',
+            ],
+            [
+                'name' => InsuredRiskType::TYPE_PERSON,
+                'code' => InsuredRiskType::CODE_PERSON,
+                'description' => 'Personas aseguradas para vida colectivo/individual o accidentes personales',
+            ],
+        ];
+
+        foreach ($insuredRiskTypes as $riskType) {
+            InsuredRiskType::firstOrCreate(['code' => $riskType['code']], $riskType);
         }
 
         // =========================================================================
