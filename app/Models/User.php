@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,6 +29,14 @@ class User extends Authenticatable
     const ROL_EMPLEADO = 'employee';
 
     const ROL_BOT = 'bot';
+
+    const ROL_ZONE_MANAGER = 'zone_manager';
+
+    const ROL_DEPARTMENT_HEAD = 'department_head';
+
+    const ROL_CASHIER = 'cashier';
+
+    const ROL_COLLECTOR = 'collector';
 
     protected $dates = ['deleted_at'];
 
@@ -88,5 +97,53 @@ class User extends Authenticatable
     public function audits()
     {
         return $this->hasMany(Audit::class);
+    }
+
+    /**
+     * Representación corporativa de la organización vinculada a este usuario.
+     */
+    public function organizationRepresentative(): HasOne
+    {
+        return $this->hasOne(OrganizationRepresentative::class);
+    }
+
+    /**
+     * Representación o supervisión de zona vinculada a este usuario.
+     */
+    public function zoneRepresentative(): HasOne
+    {
+        return $this->hasOne(ZoneRepresentative::class);
+    }
+
+    /**
+     * Representación o encargado de oficina vinculado a este usuario.
+     */
+    public function officeRepresentative(): HasOne
+    {
+        return $this->hasOne(OfficeRepresentative::class);
+    }
+
+    /**
+     * Representación o jefatura de departamento vinculada a este usuario.
+     */
+    public function departmentRepresentative(): HasOne
+    {
+        return $this->hasOne(DepartmentRepresentative::class);
+    }
+
+    /**
+     * Asignación de cajero vinculada a este usuario.
+     */
+    public function cashier(): HasOne
+    {
+        return $this->hasOne(Cashier::class);
+    }
+
+    /**
+     * Registro de recaudador vinculado a este usuario.
+     */
+    public function collector(): HasOne
+    {
+        return $this->hasOne(Collector::class);
     }
 }

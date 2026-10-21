@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\BusinessActivity;
+use App\Models\CashRegisterType;
 use App\Models\EmployeeType;
 use App\Models\FiscalCondition;
 use App\Models\Gender;
@@ -119,14 +120,48 @@ class CatalogSeeder extends Seeder
         $this->command->info('Seeding: Employee Types...');
 
         $typesEmployees = [
+            //!TODO: Actualizar bien todos los roles y sus codes para saber que tipo de usuarios pondremos en el sistema
             ['name' => EmployeeType::TYPE_GOD, 'code' => EmployeeType::CODE_GOD, 'description' => 'Super administrador con acceso total'],
             ['name' => EmployeeType::TYPE_ADMIN, 'code' => EmployeeType::CODE_ADMIN, 'description' => 'Administrador del sistema'],
             ['name' => EmployeeType::TYPE_OPERATOR, 'code' => EmployeeType::CODE_OPERATOR, 'description' => 'Operador de atención al cliente'],
             ['name' => EmployeeType::TYPE_BOT, 'code' => EmployeeType::CODE_BOT, 'description' => 'Usuario para procesos automatizados'],
+            ['name' => EmployeeType::TYPE_CASHIER, 'code' => EmployeeType::CODE_CASHIER, 'description' => 'Operador de caja registradora y cobranza'],
+            ['name' => EmployeeType::TYPE_COLLECTOR, 'code' => EmployeeType::CODE_COLLECTOR, 'description' => 'Recaudador territorial de cobranza'],
+            ['name' => EmployeeType::TYPE_ZONE_SUPERVISOR, 'code' => EmployeeType::CODE_ZONE_SUPERVISOR, 'description' => 'Supervisor o gerente de zona'],
+            ['name' => EmployeeType::TYPE_DEPARTMENT_HEAD, 'code' => EmployeeType::CODE_DEPARTMENT_HEAD, 'description' => 'Responsable o jefe de departamento'],
+            ['name' => EmployeeType::TYPE_PRODUCER, 'code' => EmployeeType::CODE_PRODUCER, 'description' => 'Productor asesor de seguros (PAS)'],
         ];
 
         foreach ($typesEmployees as $type) {
-            EmployeeType::create($type);
+            EmployeeType::firstOrCreate(['code' => $type['code']], $type);
+        }
+
+        // =========================================================================
+        // 6. Cash Register Types (Tipos de Caja Registradora)
+        // Propósito: Clasificación operativa de cajas (Física, Virtual, Bancaria).
+        // =========================================================================
+        $this->command->info('Seeding: Cash Register Types...');
+
+        $cashRegisterTypes = [
+            [
+                'name' => CashRegisterType::TYPE_PHYSICAL,
+                'code' => CashRegisterType::CODE_PHYSICAL,
+                'description' => 'Caja registradora para cobros en efectivo en sucursal',
+            ],
+            [
+                'name' => CashRegisterType::TYPE_VIRTUAL,
+                'code' => CashRegisterType::CODE_VIRTUAL,
+                'description' => 'Caja lógica para pasarelas, transferencias o cobros digitales',
+            ],
+            [
+                'name' => CashRegisterType::TYPE_BANK,
+                'code' => CashRegisterType::CODE_BANK,
+                'description' => 'Cuenta bancaria operativa de la organización',
+            ],
+        ];
+
+        foreach ($cashRegisterTypes as $registerType) {
+            CashRegisterType::firstOrCreate(['code' => $registerType['code']], $registerType);
         }
     }
 }
